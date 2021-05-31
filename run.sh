@@ -1,6 +1,7 @@
 #!/bin/bash
+filePath=../data/fng.1000.csv.rot128
 
 go build -o build/app
 cd build
-./app -f ../data/fng.1000.csv.rot128
+./app -f $filePath
 cd ..

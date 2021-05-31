@@ -3,7 +3,8 @@ package controller
 import (
 	"fmt"
 	"os"
-	flag "tamboon/service/flag"
+	"tamboon/service/decrypt"
+	"tamboon/service/flag"
 	"time"
 )
 
@@ -18,4 +19,8 @@ func App() {
 	}
 	fmt.Printf("Performing donations on %s\n", flag.GetFilePath())
 
+	decrypt.Init(flag.GetFilePath())
+	defer decrypt.CloseFile()
+
+	decrypt.GetDecrypt()
 }

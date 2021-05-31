@@ -6,6 +6,7 @@ import (
 )
 
 var file = flag.String("f", "", "path to file")
+var number = flag.Int("n", 20, "number of tasks")
 
 func PraseFlag() (ok bool) {
 	flag.Parse()
@@ -22,4 +23,8 @@ func PraseFlag() (ok bool) {
 
 func GetFilePath() string {
 	return *file
+}
+
+func GetNumberTask() int {
+	return *number
 }
