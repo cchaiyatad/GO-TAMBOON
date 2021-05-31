@@ -2,7 +2,6 @@ package transaction
 
 import (
 	"bytes"
-	"os"
 	"strconv"
 )
 
@@ -22,16 +21,16 @@ func CreateTransaction(d []byte) (*Transaction, error) {
 	// check for error
 	amount, err := strconv.Atoi(string(field[1]))
 	if err != nil {
-		os.Exit(1)
+		return nil, err
 	}
 	month, err := strconv.Atoi(string(field[4]))
 	if err != nil {
-		os.Exit(1)
+		return nil, err
 	}
 
 	year, err := strconv.Atoi(string(field[5]))
 	if err != nil {
-		os.Exit(1)
+		return nil, err
 	}
 
 	return &Transaction{

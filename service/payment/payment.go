@@ -11,16 +11,16 @@ import (
 
 var client *omise.Client
 
-func Init(publicKey, secretKey string) {
+func Init(publicKey, secretKey string, counts int) {
 	var e error
 	client, e = omise.NewClient(publicKey, secretKey)
 	if e != nil {
 		log.Fatal(e)
 	}
+	makeConsumers(counts)
 }
 
 func createToken(tran *T.Transaction) (token *omise.Token, e error) {
-
 	token, createToken := &omise.Token{}, &operations.CreateToken{
 		Name:            tran.Name,
 		Number:          tran.CardNumber,
@@ -30,19 +30,22 @@ func createToken(tran *T.Transaction) (token *omise.Token, e error) {
 	}
 
 	if e := client.Do(token, createToken); e != nil {
-		log.Fatalln(e)
+		// log.Fatalln(e)
 		return nil, e
 	}
 
 	return
 }
 
-func Charge(tran *T.Transaction) {
+func charge(tran *T.Transaction) bool {
 
 	token, e := createToken(tran)
+
 	if e != nil {
+		return false
 		//TODO: Error
-		log.Fatal(e)
+		// fmt.Println(tran)
+		// log.Fatal(e)
 	}
 
 	// Creates a charge from the token
@@ -51,9 +54,9 @@ func Charge(tran *T.Transaction) {
 		Currency: "thb",
 		Card:     token.ID,
 	}
-	if e = client.Do(charge, createCharge); e != nil {
-		log.Fatal(e)
-	}
-
-	log.Printf("charge: %s  amount: %s %d\n", charge.ID, charge.Currency, charge.Amount)
+	e = client.Do(charge, createCharge)
+	// if e != nil {
+	// 	log.Fatal(e)
+	// }
+	return e == nil
 }

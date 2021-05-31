@@ -8,7 +8,7 @@ import (
 var file = flag.String("f", "", "path to file")
 var pk = flag.String("pk", "", "omise Public Key")
 var sk = flag.String("sk", "", "omise Secret Key")
-var number = flag.Int("n", 20, "number of tasks")
+var number = flag.Int("n", 8, "number of tasks")
 
 func PraseFlag() (ok bool) {
 	flag.Parse()

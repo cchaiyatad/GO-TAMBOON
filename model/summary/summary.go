@@ -11,7 +11,7 @@ type Summary struct {
 	MaxName       string
 }
 
-func CreateNewSummary(d []byte) (*Summary, error) {
+func CreateNewSummary() (*Summary, error) {
 	return &Summary{
 		CountSuccess:  0,
 		AmountSuccess: 0,

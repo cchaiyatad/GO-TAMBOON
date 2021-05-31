@@ -19,19 +19,26 @@ func Init(filePath string) {
 	}
 
 	rotData, err = cipher.NewRot128Reader(fp)
-	producer = make(chan []byte, 10)
+	producer = make(chan []byte)
+	decrypt()
 }
 
 //	Format: Name,Amount,Card,CCV,Month,Year
 // 	Ex: 	Mr. Bildad R Sackville,5073530,4716972894061735,064,8,2019
-func GetDecrypt() {
+func decrypt() {
 	scanner := bufio.NewScanner(rotData)
 	scanner.Split(bufio.ScanLines)
-
 	for scanner.Scan() {
-		// fmt.Printf("%s\n", scanner.Text())
-		producer <- []byte(scanner.Text())
+		txt := []byte(scanner.Text())
+		go func(txt []byte) {
+			producer <- txt
+			// fmt.Printf("%s\n", txt)
+		}(txt)
 	}
+	go func() {
+		producer <- nil
+	}()
+
 }
 
 func Producer() <-chan []byte {
