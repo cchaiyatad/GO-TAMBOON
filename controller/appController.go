@@ -27,11 +27,6 @@ func App() {
 	decrypt.GetDecrypt()
 	payment.Init(flag.GetPublickey(), flag.GetSecretkey())
 
-	tran, _ := transaction.CreateTestTransaction()
+	tran, _ := transaction.CreateTransaction([]byte("Mr. Holfast J Labingi,3381761,5472068035825145,350,5,2023"))
 	payment.Charge(tran)
-	fmt.Println("")
-	fmt.Println("")
-	fmt.Println("")
-	tran2, _ := transaction.CreateTransaction([]byte("Mr. Holfast J Labingi,3381761,5472068035825145,350,5,2023"))
-	payment.Charge(tran2)
 }

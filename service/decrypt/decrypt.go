@@ -2,13 +2,13 @@ package decrypt
 
 import (
 	"bufio"
-	"fmt"
 	"os"
 	"tamboon/cipher"
 )
 
 var fp *os.File
 var rotData *cipher.Rot128Reader
+var producer chan []byte
 
 func Init(filePath string) {
 
@@ -19,7 +19,7 @@ func Init(filePath string) {
 	}
 
 	rotData, err = cipher.NewRot128Reader(fp)
-
+	producer = make(chan []byte, 10)
 }
 
 //	Format: Name,Amount,Card,CCV,Month,Year
@@ -29,8 +29,13 @@ func GetDecrypt() {
 	scanner.Split(bufio.ScanLines)
 
 	for scanner.Scan() {
-		fmt.Printf("%s\n", scanner.Text())
+		// fmt.Printf("%s\n", scanner.Text())
+		producer <- []byte(scanner.Text())
 	}
+}
+
+func Producer() <-chan []byte {
+	return producer
 }
 
 func CloseFile() {

@@ -34,7 +34,6 @@ func createToken(tran *T.Transaction) (token *omise.Token, e error) {
 		return nil, e
 	}
 
-	log.Printf("created card: %#v\n", token)
 	return
 }
 

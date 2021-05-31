@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-// 	Ex: 	Mr. Bildad R Sackville,5073530,4716972894061735,064,8,2019
+// 	Ex: Mr. Bildad R Sackville,5073530,4716972894061735,064,8,2019
 type Transaction struct {
 	Name       string
 	Amount     int64
@@ -18,8 +18,8 @@ type Transaction struct {
 
 func CreateTransaction(d []byte) (*Transaction, error) {
 	field := bytes.Split(d, []byte(","))
-	// check for error
 
+	// check for error
 	amount, err := strconv.Atoi(string(field[1]))
 	if err != nil {
 		os.Exit(1)
@@ -41,18 +41,5 @@ func CreateTransaction(d []byte) (*Transaction, error) {
 		CCV:        string(field[3]),
 		Month:      month,
 		Year:       year,
-	}, nil
-
-}
-
-func CreateTestTransaction() (*Transaction, error) {
-	// check for error
-	return &Transaction{
-		Name:       "Ms. Semolina B Brockhouse",
-		Amount:     2674018,
-		CardNumber: "4539823809118158",
-		CCV:        "260",
-		Month:      10,
-		Year:       2022,
 	}, nil
 }
