@@ -1,1 +1,67 @@
 package payment
+
+import (
+	"log"
+	T "tamboon/model/transaction"
+	"time"
+
+	"github.com/omise/omise-go"
+	"github.com/omise/omise-go/operations"
+)
+
+const (
+	omisePublicKey = "pkey_test_5o0w33kibttrj8mbs85"
+	omiseSecretKey = "skey_test_5o0w33kibp2hq86knfy"
+)
+
+var client *omise.Client
+
+// var data *omise.Charge
+
+func init() {
+	var e error
+	client, e = omise.NewClient(omisePublicKey, omiseSecretKey)
+	if e != nil {
+		log.Fatal(e)
+	}
+}
+
+func createToken(tran *T.Transaction) (token *omise.Token, e error) {
+
+	token, createToken := &omise.Token{}, &operations.CreateToken{
+		Name:            tran.Name,
+		Number:          tran.CardNumber,
+		ExpirationMonth: time.Month(tran.Month),
+		ExpirationYear:  tran.Year,
+		SecurityCode:    tran.CCV,
+	}
+
+	if e := client.Do(token, createToken); e != nil {
+		log.Fatalln(e)
+		return nil, e
+	}
+
+	log.Printf("created card: %#v\n", token)
+	return
+}
+
+func Charge(tran *T.Transaction) {
+
+	token, e := createToken(tran)
+	if e != nil {
+		//TODO: Error
+		log.Fatal(e)
+	}
+
+	// Creates a charge from the token
+	charge, createCharge := &omise.Charge{}, &operations.CreateCharge{
+		Amount:   int64(tran.Amount),
+		Currency: "thb",
+		Card:     token.ID,
+	}
+	if e = client.Do(charge, createCharge); e != nil {
+		log.Fatal(e)
+	}
+
+	log.Printf("charge: %s  amount: %s %d\n", charge.ID, charge.Currency, charge.Amount)
+}

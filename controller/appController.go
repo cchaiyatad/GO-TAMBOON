@@ -3,8 +3,10 @@ package controller
 import (
 	"fmt"
 	"os"
+	"tamboon/model/transaction"
 	"tamboon/service/decrypt"
 	"tamboon/service/flag"
+	"tamboon/service/payment"
 	"time"
 )
 
@@ -23,4 +25,6 @@ func App() {
 	defer decrypt.CloseFile()
 
 	decrypt.GetDecrypt()
+	tran, _ := transaction.CreateTestTransaction()
+	payment.Charge(tran)
 }
