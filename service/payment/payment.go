@@ -30,7 +30,7 @@ func createToken(tran *T.Transaction) (token *omise.Token, e error) {
 	}
 
 	if e := client.Do(token, createToken); e != nil {
-		// log.Fatalln(e)
+		//TODO: Error
 		return nil, e
 	}
 
@@ -55,8 +55,11 @@ func charge(tran *T.Transaction) bool {
 		Card:     token.ID,
 	}
 	e = client.Do(charge, createCharge)
+	//TODO: Error
+
 	// if e != nil {
 	// 	log.Fatal(e)
 	// }
+	// log.Printf("created charge: %#v\n", charge)
 	return e == nil
 }

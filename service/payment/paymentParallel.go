@@ -6,11 +6,9 @@ import (
 	T "tamboon/model/transaction"
 )
 
-// var semaphor chan struct{}
 var consumers chan *S.Summary
 
 func makeConsumers(counts int) {
-	// semaphor = make(chan struct{}, counts)
 	consumers = make(chan *S.Summary, counts)
 	for i := 0; i < counts; i++ {
 		go func() {
@@ -25,30 +23,23 @@ func chargeParallel(sum *S.Summary, raw []byte) *S.Summary {
 		sum, _ = S.CreateNewSummary()
 	}
 
-	// semaphor <- struct{}{}
 	func(r []byte) {
 		tran, err := T.CreateTransaction(r)
-		// fmt.Printf("%v:%v:%v:%v\n", string(r), tran, sum, err)
 		if err == nil {
 			isSuccess := charge(tran)
 			sum.Update(*tran, isSuccess)
 		}
-		// fmt.Println("Here")
 	}(raw)
-	// <-semaphor
 	return sum
 }
 
 func Run(pd <-chan []byte) {
-	// n := 1
-	// for ; n > 0; n-- {
 	for {
 		rawData, ok := <-pd
 		if !ok || rawData == nil {
 			break
 		}
 		s := <-consumers
-		// n++
 		go func(raw []byte) {
 			consumers <- chargeParallel(s, raw)
 		}(rawData)
