@@ -9,18 +9,13 @@ import (
 	"github.com/omise/omise-go/operations"
 )
 
-const (
-	omisePublicKey = "pkey_test_5o0w33kibttrj8mbs85"
-	omiseSecretKey = "skey_test_5o0w33kibp2hq86knfy"
-)
-
 var client *omise.Client
 
 // var data *omise.Charge
 
-func init() {
+func Init(publicKey, secretKey string) {
 	var e error
-	client, e = omise.NewClient(omisePublicKey, omiseSecretKey)
+	client, e = omise.NewClient(publicKey, secretKey)
 	if e != nil {
 		log.Fatal(e)
 	}

@@ -25,6 +25,7 @@ func App() {
 	defer decrypt.CloseFile()
 
 	decrypt.GetDecrypt()
+	payment.Init(flag.GetPublickey(), flag.GetSecretkey())
 	tran, _ := transaction.CreateTestTransaction()
 	payment.Charge(tran)
 }
