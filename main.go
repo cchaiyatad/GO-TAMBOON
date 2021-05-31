@@ -1,7 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"tamboon/controller"
+)
 
 func main() {
-	fmt.Println("Hello World!")
+	controller.App()
 }
