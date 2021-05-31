@@ -11,8 +11,6 @@ import (
 
 var client *omise.Client
 
-// var data *omise.Charge
-
 func Init(publicKey, secretKey string) {
 	var e error
 	client, e = omise.NewClient(publicKey, secretKey)
