@@ -1,6 +1,7 @@
 package summaries
 
 import (
+	"fmt"
 	S "tamboon/model/summary"
 )
 
@@ -15,4 +16,10 @@ func GetConsumers(counts int) chan *S.Summary {
 
 func CleanConsumer(consumers chan *S.Summary) {
 	close(consumers)
+}
+
+func PrintSummaries(consumers <-chan *S.Summary) {
+	for consumer := range consumers {
+		fmt.Printf("%s\n", consumer)
+	}
 }

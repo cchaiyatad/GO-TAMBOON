@@ -19,7 +19,7 @@ func beginTransaction(client *omise.Client, consumers chan *summary.Summary) {
 	if err != nil {
 		//TODO: Error
 		decrypt.CleanProducer(filePointer)
-		fmt.Println(err)
+		// fmt.Println(err)
 		os.Exit(1)
 	}
 
@@ -32,16 +32,16 @@ func beginTransaction(client *omise.Client, consumers chan *summary.Summary) {
 
 		tran, err := transaction.CreateTransaction(line)
 		if err != nil {
-			fmt.Println(err)
+			// fmt.Println(err)
 			continue
 		}
-		fmt.Println(tran)
+		// fmt.Println(tran)
 		// err = payment.BeginCharge(tran, client)
 		consumer := <-consumers
 		consumer.Update(*tran, err == nil)
 		consumers <- consumer
 	}
-
+	fmt.Println("Done.")
 	decrypt.CleanProducer(filePointer)
 	summaries.CleanConsumer(consumers)
 }
@@ -69,8 +69,6 @@ func App() {
 	beginTransaction(client, consumers)
 
 	//summaries
-	for consumer := range consumers {
-		fmt.Printf("%#v\n", consumer)
-	}
+	summaries.PrintSummaries(consumers)
 
 }
