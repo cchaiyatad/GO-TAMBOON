@@ -2,49 +2,48 @@ package decrypt
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"tamboon/cipher"
 )
 
-var fp *os.File
-var rotData *cipher.Rot128Reader
-var producer chan []byte
+func GetProducer(filePath string) (<-chan []byte, *os.File) {
+	rot, fp, _ := getDecryptFile(filePath)
+	// TODO: Check error
 
-func Init(filePath string) {
+	prod := make(chan []byte)
+	go beginDecrypt(rot, prod)
+	return prod, fp
+}
 
+func CleanProducer(fp *os.File) {
+	fp.Close()
+}
+
+func getDecryptFile(filePath string) (*cipher.Rot128Reader, *os.File, error) {
 	fp, err := os.Open(filePath)
 
 	if err != nil {
-		panic(err)
+		// TODO: handle error
+		return nil, nil, err
 	}
 
-	rotData, err = cipher.NewRot128Reader(fp)
-	producer = make(chan []byte)
-	decrypt()
+	rot, err := cipher.NewRot128Reader(fp)
+
+	// TODO: handle error
+	return rot, fp, err
 }
 
-//	Format: Name,Amount,Card,CCV,Month,Year
-// 	Ex: 	Mr. Bildad R Sackville,5073530,4716972894061735,064,8,2019
-func decrypt() {
-	scanner := bufio.NewScanner(rotData)
+func beginDecrypt(rot *cipher.Rot128Reader, prod chan<- []byte) {
+	scanner := bufio.NewScanner(rot)
 	scanner.Split(bufio.ScanLines)
+	fmt.Printf("%s\n", "Hi")
 	for scanner.Scan() {
 		txt := []byte(scanner.Text())
-		go func(txt []byte) {
-			producer <- txt
-			// fmt.Printf("%s\n", txt)
-		}(txt)
+		// fmt.Printf("%s\n", txt)
+		prod <- txt
 	}
-	go func() {
-		producer <- nil
-	}()
 
-}
-
-func Producer() <-chan []byte {
-	return producer
-}
-
-func CloseFile() {
-	fp.Close()
+	// End signal
+	prod <- nil
 }

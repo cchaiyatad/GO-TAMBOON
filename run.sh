@@ -8,5 +8,5 @@ cd build
 ./app -f $filePath \
     -pk $omisePublicKey \
     -sk $omiseSecretKey \
-    -n 1
+    -n 4
 cd ..
