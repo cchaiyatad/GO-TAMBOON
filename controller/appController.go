@@ -41,7 +41,7 @@ func beginTransaction(client *omise.Client, consumers chan *summary.Summary) {
 		consumer.Update(*tran, err == nil)
 		consumers <- consumer
 	}
-	fmt.Println("Done.")
+	fmt.Printf("Done.\n\n")
 	decrypt.CleanProducer(filePointer)
 	summaries.CleanConsumer(consumers)
 }
@@ -68,7 +68,6 @@ func App() {
 
 	beginTransaction(client, consumers)
 
-	//summaries
 	summaries.PrintSummaries(consumers)
 
 }

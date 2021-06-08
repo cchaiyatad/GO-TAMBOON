@@ -46,3 +46,16 @@ func (s *Summary) Update(t T.Transaction, isSuccess bool) {
 		s.AmountFail += int(t.Amount)
 	}
 }
+
+func (s1 *Summary) Merge(s2 *Summary) {
+	s1.AmountFail += s2.AmountFail
+	s1.CountFail += s2.CountFail
+	s1.AmountSuccess += s2.AmountSuccess
+	s1.CountSuccess += s2.CountSuccess
+
+	topDonor := make(D.TopDonors, len(s1.Donors))
+	copy(topDonor, s1.Donors)
+	topDonor = append(topDonor, s2.Donors...)
+	sort.Sort(topDonor)
+	s1.Donors = topDonor[:3]
+}
