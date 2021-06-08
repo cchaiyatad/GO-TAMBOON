@@ -1,7 +1,6 @@
 package payment
 
 import (
-	"log"
 	T "tamboon/model/transaction"
 	"time"
 
@@ -9,18 +8,26 @@ import (
 	"github.com/omise/omise-go/operations"
 )
 
-var client *omise.Client
-
-func Init(publicKey, secretKey string, counts int) {
-	var e error
-	client, e = omise.NewClient(publicKey, secretKey)
-	if e != nil {
-		log.Fatal(e)
-	}
-	makeConsumers(counts)
+func GetClient(publicKey, secretKey string) (*omise.Client, error) {
+	return omise.NewClient(publicKey, secretKey)
 }
 
-func createToken(tran *T.Transaction) (token *omise.Token, e error) {
+func BeginCharge(raw []byte, client *omise.Client) error {
+	tran, err := T.CreateTransaction(raw)
+
+	if err != nil {
+		return err
+	}
+
+	token, err := createToken(tran, client)
+	if err != nil {
+		return err
+	}
+
+	return doCharge(token, tran, client)
+}
+
+func createToken(tran *T.Transaction, client *omise.Client) (*omise.Token, error) {
 	token, createToken := &omise.Token{}, &operations.CreateToken{
 		Name:            tran.Name,
 		Number:          tran.CardNumber,
@@ -29,37 +36,21 @@ func createToken(tran *T.Transaction) (token *omise.Token, e error) {
 		SecurityCode:    tran.CCV,
 	}
 
-	if e := client.Do(token, createToken); e != nil {
-		//TODO: Error
-		return nil, e
+	if err := client.Do(token, createToken); err != nil {
+		return nil, err
 	}
 
-	return
+	return token, nil
 }
 
-func charge(tran *T.Transaction) bool {
-
-	token, e := createToken(tran)
-
-	if e != nil {
-		return false
-		//TODO: Error
-		// fmt.Println(tran)
-		// log.Fatal(e)
-	}
-
+func doCharge(token *omise.Token, tran *T.Transaction, client *omise.Client) error {
 	// Creates a charge from the token
 	charge, createCharge := &omise.Charge{}, &operations.CreateCharge{
 		Amount:   int64(tran.Amount),
 		Currency: "thb",
 		Card:     token.ID,
 	}
-	e = client.Do(charge, createCharge)
-	//TODO: Error
 
-	// if e != nil {
-	// 	log.Fatal(e)
-	// }
-	// log.Printf("created charge: %#v\n", charge)
-	return e == nil
+	// if err == mil mean finish
+	return client.Do(charge, createCharge)
 }

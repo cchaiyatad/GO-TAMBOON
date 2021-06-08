@@ -11,7 +11,7 @@ type Summary struct {
 	MaxName       string
 }
 
-func CreateNewSummary() (*Summary, error) {
+func CreateNewSummary() *Summary {
 	return &Summary{
 		CountSuccess:  0,
 		AmountSuccess: 0,
@@ -19,7 +19,7 @@ func CreateNewSummary() (*Summary, error) {
 		AmountFail:    0,
 		MaxAmount:     0,
 		MaxName:       "",
-	}, nil
+	}
 }
 
 func (s *Summary) Update(t T.Transaction, isSuccess bool) {

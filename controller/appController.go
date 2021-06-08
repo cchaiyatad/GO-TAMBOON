@@ -11,7 +11,12 @@ import (
 )
 
 func beginTransaction() {
-	producer, filePointer := decrypt.GetProducer(flag.GetFilePath())
+	producer, filePointer, err := decrypt.GetProducer(flag.GetFilePath())
+	if err != nil {
+		//TODO: Error
+		decrypt.CleanProducer(filePointer)
+		os.Exit(1)
+	}
 
 	for line := range producer {
 		// fmt.Println(line)
@@ -36,11 +41,17 @@ func App() {
 	defer func() { fmt.Printf("Executed time: %s\n", time.Since(start)) }()
 
 	if ok := flag.PraseFlag(); !ok {
-		// TODO: print error
+		// TODO: error
 		os.Exit(1)
 	}
 
-	payment.Init(flag.GetPublickey(), flag.GetSecretkey(), flag.GetNumberTask())
+	// payment.Init(flag.GetPublickey(), flag.GetSecretkey(), flag.GetNumberTask())
+	_, err := payment.GetClient(flag.GetPublickey(), flag.GetSecretkey())
+
+	if err != nil {
+		// TODO: error
+		os.Exit(1)
+	}
 
 	fmt.Printf("Performing donations on %s\n", flag.GetFilePath())
 

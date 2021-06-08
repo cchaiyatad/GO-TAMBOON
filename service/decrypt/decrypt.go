@@ -7,13 +7,15 @@ import (
 	"tamboon/cipher"
 )
 
-func GetProducer(filePath string) (<-chan []byte, *os.File) {
-	rotData, filePointer, _ := getDecryptFile(filePath)
-	// TODO: Check error
+func GetProducer(filePath string) (<-chan []byte, *os.File, error) {
+	rotData, filePointer, err := getDecryptFile(filePath)
+	if err != nil {
+		return nil, filePointer, err
+	}
 
 	producer := make(chan []byte)
 	go beginDecrypt(rotData, producer)
-	return producer, filePointer
+	return producer, filePointer, nil
 }
 
 func CleanProducer(filePointer *os.File) {
@@ -24,13 +26,11 @@ func getDecryptFile(filePath string) (*cipher.Rot128Reader, *os.File, error) {
 	filePointer, err := os.Open(filePath)
 
 	if err != nil {
-		// TODO: handle error
 		return nil, nil, err
 	}
 
 	rotData, err := cipher.NewRot128Reader(filePointer)
 
-	// TODO: handle error
 	return rotData, filePointer, err
 }
 
