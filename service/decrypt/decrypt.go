@@ -8,34 +8,34 @@ import (
 )
 
 func GetProducer(filePath string) (<-chan []byte, *os.File) {
-	rot, fp, _ := getDecryptFile(filePath)
+	rotData, filePointer, _ := getDecryptFile(filePath)
 	// TODO: Check error
 
-	prod := make(chan []byte)
-	go beginDecrypt(rot, prod)
-	return prod, fp
+	producer := make(chan []byte)
+	go beginDecrypt(rotData, producer)
+	return producer, filePointer
 }
 
-func CleanProducer(fp *os.File) {
-	fp.Close()
+func CleanProducer(filePointer *os.File) {
+	filePointer.Close()
 }
 
 func getDecryptFile(filePath string) (*cipher.Rot128Reader, *os.File, error) {
-	fp, err := os.Open(filePath)
+	filePointer, err := os.Open(filePath)
 
 	if err != nil {
 		// TODO: handle error
 		return nil, nil, err
 	}
 
-	rot, err := cipher.NewRot128Reader(fp)
+	rotData, err := cipher.NewRot128Reader(filePointer)
 
 	// TODO: handle error
-	return rot, fp, err
+	return rotData, filePointer, err
 }
 
-func beginDecrypt(rot *cipher.Rot128Reader, prod chan<- []byte) {
-	scanner := bufio.NewScanner(rot)
+func beginDecrypt(rotData *cipher.Rot128Reader, prod chan<- []byte) {
+	scanner := bufio.NewScanner(rotData)
 	scanner.Split(bufio.ScanLines)
 	fmt.Printf("%s\n", "Hi")
 	for scanner.Scan() {

@@ -3,29 +3,39 @@ package controller
 import (
 	"fmt"
 	"os"
+	"tamboon/model/transaction"
 	"tamboon/service/decrypt"
 	"tamboon/service/flag"
 	"tamboon/service/payment"
 	"time"
 )
 
-func get() {
-	prod, fp := decrypt.GetProducer(flag.GetFilePath())
+func beginTransaction() {
+	producer, filePointer := decrypt.GetProducer(flag.GetFilePath())
 
-	for line := range prod {
-		fmt.Println(line)
+	for line := range producer {
+		// fmt.Println(line)
+		if line == nil {
+			// EOF
+			break
+		}
+
+		tran, err := transaction.CreateTransaction(line)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		fmt.Println(tran)
 	}
 
-	decrypt.CleanProducer(fp)
+	decrypt.CleanProducer(filePointer)
 }
 
 func App() {
 	start := time.Now()
 	defer func() { fmt.Printf("Executed time: %s\n", time.Since(start)) }()
 
-	ok := flag.PraseFlag()
-
-	if !ok {
+	if ok := flag.PraseFlag(); !ok {
 		// TODO: print error
 		os.Exit(1)
 	}
@@ -33,20 +43,8 @@ func App() {
 	payment.Init(flag.GetPublickey(), flag.GetSecretkey(), flag.GetNumberTask())
 
 	fmt.Printf("Performing donations on %s\n", flag.GetFilePath())
-	// prod := decrypt.GetProducer(flag.GetFilePath())
 
-	// for line := range prod {
-	// 	fmt.Println(line)
-	// }
-	go get()
-	time.Sleep(time.Second * 20)
-	// decrypt.Init(flag.GetFilePath())
-	// defer decrypt.CloseFile()
-	// go get()
-	// prod := decrypt.Producer()
+	beginTransaction()
 
-	// for line := range prod {
-	// 	fmt.Println(line)
-	// }
-	// payment.Run(prod)
+	// payment.Run(producer)
 }

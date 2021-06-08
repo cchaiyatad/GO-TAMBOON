@@ -5,7 +5,6 @@ import (
 	"strconv"
 )
 
-// 	Ex: Mr. Bildad R Sackville,5073530,4716972894061735,064,8,2019
 type Transaction struct {
 	Name       string
 	Amount     int64
@@ -15,6 +14,7 @@ type Transaction struct {
 	Year       int
 }
 
+// 	Ex: Mr. Bildad R Sackville,5073530,4716972894061735,064,8,2019
 func CreateTransaction(d []byte) (*Transaction, error) {
 	field := bytes.Split(d, []byte(","))
 
