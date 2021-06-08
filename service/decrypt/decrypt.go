@@ -2,7 +2,6 @@ package decrypt
 
 import (
 	"bufio"
-	"fmt"
 	"os"
 	"tamboon/cipher"
 )
@@ -37,7 +36,6 @@ func getDecryptFile(filePath string) (*cipher.Rot128Reader, *os.File, error) {
 func beginDecrypt(rotData *cipher.Rot128Reader, prod chan<- []byte) {
 	scanner := bufio.NewScanner(rotData)
 	scanner.Split(bufio.ScanLines)
-	fmt.Printf("%s\n", "Hi")
 	for scanner.Scan() {
 		txt := []byte(scanner.Text())
 		// fmt.Printf("%s\n", txt)

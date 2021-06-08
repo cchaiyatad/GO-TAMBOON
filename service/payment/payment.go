@@ -12,13 +12,7 @@ func GetClient(publicKey, secretKey string) (*omise.Client, error) {
 	return omise.NewClient(publicKey, secretKey)
 }
 
-func BeginCharge(raw []byte, client *omise.Client) error {
-	tran, err := T.CreateTransaction(raw)
-
-	if err != nil {
-		return err
-	}
-
+func BeginCharge(tran *T.Transaction, client *omise.Client) error {
 	token, err := createToken(tran, client)
 	if err != nil {
 		return err

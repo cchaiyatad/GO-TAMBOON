@@ -3,18 +3,23 @@ package controller
 import (
 	"fmt"
 	"os"
+	"tamboon/model/summary"
 	"tamboon/model/transaction"
 	"tamboon/service/decrypt"
 	"tamboon/service/flag"
 	"tamboon/service/payment"
+	"tamboon/service/summaries"
 	"time"
+
+	"github.com/omise/omise-go"
 )
 
-func beginTransaction() {
+func beginTransaction(client *omise.Client, consumers chan *summary.Summary) {
 	producer, filePointer, err := decrypt.GetProducer(flag.GetFilePath())
 	if err != nil {
 		//TODO: Error
 		decrypt.CleanProducer(filePointer)
+		fmt.Println(err)
 		os.Exit(1)
 	}
 
@@ -31,9 +36,14 @@ func beginTransaction() {
 			continue
 		}
 		fmt.Println(tran)
+		// err = payment.BeginCharge(tran, client)
+		consumer := <-consumers
+		consumer.Update(*tran, err == nil)
+		consumers <- consumer
 	}
 
 	decrypt.CleanProducer(filePointer)
+	summaries.CleanConsumer(consumers)
 }
 
 func App() {
@@ -45,17 +55,22 @@ func App() {
 		os.Exit(1)
 	}
 
-	// payment.Init(flag.GetPublickey(), flag.GetSecretkey(), flag.GetNumberTask())
-	_, err := payment.GetClient(flag.GetPublickey(), flag.GetSecretkey())
+	fmt.Printf("Performing donations on %s\n", flag.GetFilePath())
+
+	client, err := payment.GetClient(flag.GetPublickey(), flag.GetSecretkey())
 
 	if err != nil {
 		// TODO: error
 		os.Exit(1)
 	}
 
-	fmt.Printf("Performing donations on %s\n", flag.GetFilePath())
+	consumers := summaries.GetConsumers(flag.GetNumberTask())
 
-	beginTransaction()
+	beginTransaction(client, consumers)
 
-	// payment.Run(producer)
+	//summaries
+	for consumer := range consumers {
+		fmt.Printf("%#v\n", consumer)
+	}
+
 }
