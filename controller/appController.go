@@ -42,7 +42,7 @@ func beginTransaction(client *omise.Client, consumers chan *summary.Summary, isD
 			log.Printf("app(transaction): %s\n", tran)
 		}
 
-		// err = payment.BeginCharge(tran, client)
+		err = payment.BeginCharge(tran, client)
 		if err != nil {
 			log.Println(err)
 		}
