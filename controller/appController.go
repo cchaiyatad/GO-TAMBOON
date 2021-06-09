@@ -3,8 +3,9 @@ package controller
 import (
 	"fmt"
 	"log"
-	"tamboon/model/summary"
+	S "tamboon/model/summary"
 	"tamboon/model/transaction"
+	T "tamboon/model/transaction"
 	"tamboon/service/decrypt"
 	"tamboon/service/flag"
 	"tamboon/service/payment"
@@ -14,7 +15,7 @@ import (
 	"github.com/omise/omise-go"
 )
 
-func beginTransaction(client *omise.Client, consumers chan *summary.Summary, isDebug bool) {
+func beginTransaction(client *omise.Client, consumers chan *S.Summary, isDebug bool) {
 	producer, filePointer, err := decrypt.GetProducer(flag.GetFilePath(), isDebug)
 	if err != nil {
 		decrypt.CleanProducer(filePointer)
@@ -26,8 +27,8 @@ func beginTransaction(client *omise.Client, consumers chan *summary.Summary, isD
 			log.Printf("app(line): %s\n", line)
 		}
 
+		// EOF
 		if line == nil {
-			// EOF
 			break
 		}
 
@@ -46,23 +47,33 @@ func beginTransaction(client *omise.Client, consumers chan *summary.Summary, isD
 			log.Printf("app(transaction): %s\n", tran)
 		}
 
-		var payErr error
-
-		if err == nil {
-			payErr = payment.BeginCharge(tran, client)
-		}
-
-		if payErr != nil {
-			log.Printf("payment error: %s\n", payErr)
-		}
-
 		consumer := <-consumers
-		consumer.Update(*tran, payErr == nil && err != nil)
-		consumers <- consumer
+		go consume(client, consumers, consumer, tran, err == nil, isDebug)
+
 	}
 	fmt.Printf("Done.\n\n")
 	decrypt.CleanProducer(filePointer)
-	summaries.CleanConsumer(consumers)
+}
+
+func consume(client *omise.Client,
+	consumers chan *S.Summary,
+	consumer *S.Summary,
+	tran *T.Transaction,
+	doCharge bool,
+	isDebug bool) {
+
+	var payErr error
+
+	if doCharge {
+		payErr = payment.BeginCharge(tran, client)
+	}
+
+	if payErr != nil {
+		log.Printf("payment error: %s\n", payErr)
+	}
+
+	consumer.Update(tran, payErr == nil && doCharge, isDebug)
+	consumers <- consumer
 }
 
 func App() {
@@ -85,6 +96,6 @@ func App() {
 
 	beginTransaction(client, consumers, flag.IsDebug())
 
-	sum := summaries.GetSummaries(consumers, flag.GetTopsNumber(), flag.IsDebug())
+	sum := summaries.GetSummaries(consumers, flag.GetTopsNumber(), flag.GetNumberTask(), flag.IsDebug())
 	sum.PrintSummaries()
 }

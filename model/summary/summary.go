@@ -2,6 +2,7 @@ package summary
 
 import (
 	"fmt"
+	"log"
 	"sort"
 	D "tamboon/model/donor"
 	T "tamboon/model/transaction"
@@ -36,7 +37,11 @@ func CreateNewSummary(size int) *Summary {
 	}
 }
 
-func (s *Summary) Update(t T.Transaction, isSuccess bool) {
+func (s *Summary) Update(t *T.Transaction, isSuccess bool, isDebug bool) {
+	if isDebug {
+		log.Printf("charge complete? : %t : %s\n", isSuccess, t)
+	}
+
 	if isSuccess {
 		s.countSuccess += 1
 		s.amountSuccess += int(t.Amount)
