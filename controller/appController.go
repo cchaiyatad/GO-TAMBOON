@@ -48,7 +48,7 @@ func beginTransaction(client *omise.Client, consumers chan *summary.Summary) {
 
 func App() {
 	start := time.Now()
-	defer func() { fmt.Printf("Executed time: %s\n", time.Since(start)) }()
+	defer func() { fmt.Printf("\nExecuted time: %s\n", time.Since(start)) }()
 
 	if ok := flag.PraseFlag(); !ok {
 		// TODO: error
@@ -64,10 +64,10 @@ func App() {
 		os.Exit(1)
 	}
 
-	consumers := summaries.GetConsumers(flag.GetNumberTask())
+	consumers := summaries.GetConsumers(flag.GetNumberTask(), flag.GetTopsNumber())
 
 	beginTransaction(client, consumers)
 
-	summaries.PrintSummaries(consumers)
-
+	sum := summaries.GetSummaries(consumers, flag.GetTopsNumber())
+	summaries.PrintSummaries(sum)
 }
