@@ -69,5 +69,5 @@ func App() {
 	beginTransaction(client, consumers)
 
 	sum := summaries.GetSummaries(consumers, flag.GetTopsNumber())
-	summaries.PrintSummaries(sum)
+	sum.PrintSummaries()
 }
