@@ -9,7 +9,7 @@ cd build
 ./app -f $filePath \
     -pk $omisePublicKey \
     -sk $omiseSecretKey \
-    -n 4 \
+    -n 3 \
     -t 3 \
     -d=$debug
 cd ..

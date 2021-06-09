@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"strconv"
+	"time"
 )
 
 type Transaction struct {
@@ -54,6 +55,14 @@ func CreateTransaction(d []byte) (*Transaction, error) {
 		return nil, err
 	}
 
+	// Check expired date
+	var expiredError error
+
+	tranDate := time.Date(year, time.Month(month), 1, 0, 0, 0, 0, time.UTC)
+	if tranDate.Before(time.Now()) {
+		expiredError = fmt.Errorf("create transaction error: expiration date cannot be in the past")
+	}
+
 	return &Transaction{
 		Name:       string(field[0]),
 		Amount:     int64(amount),
@@ -61,5 +70,5 @@ func CreateTransaction(d []byte) (*Transaction, error) {
 		CCV:        string(field[3]),
 		Month:      month,
 		Year:       year,
-	}, nil
+	}, expiredError
 }

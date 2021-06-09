@@ -31,23 +31,33 @@ func beginTransaction(client *omise.Client, consumers chan *summary.Summary, isD
 			break
 		}
 
-		// not in a format Ex. header
+		// not in a format Ex. header, expired card
 		tran, err := transaction.CreateTransaction(line)
 		if err != nil {
 			log.Println(err)
+		}
+
+		// only continue here for invalid format like header
+		if tran == nil {
 			continue
 		}
 
-		if isDebug {
+		if isDebug && tran != nil {
 			log.Printf("app(transaction): %s\n", tran)
 		}
 
-		err = payment.BeginCharge(tran, client)
-		if err != nil {
-			log.Println(err)
+		var payErr error
+
+		if err == nil {
+			payErr = payment.BeginCharge(tran, client)
 		}
+
+		if payErr != nil {
+			log.Printf("payment error: %s\n", payErr)
+		}
+
 		consumer := <-consumers
-		consumer.Update(*tran, err == nil)
+		consumer.Update(*tran, payErr == nil && err != nil)
 		consumers <- consumer
 	}
 	fmt.Printf("Done.\n\n")
