@@ -65,7 +65,7 @@ func consume(client *omise.Client,
 	var payErr error
 
 	if doCharge {
-		// payErr = payment.BeginCharge(tran, client)
+		payErr = payment.BeginCharge(tran, client)
 	}
 
 	if payErr != nil {
