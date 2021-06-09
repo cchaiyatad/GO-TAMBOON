@@ -22,7 +22,7 @@ const (
 	avg            = "average per person"
 
 	topDonorHeaderFormat = "Top %d Donors:\n"
-	topDonorFormat       = "%2d. %-25s : %12.2f THB\n"
+	topDonorFormat       = "%2d. %-30s : %12.2f THB\n"
 )
 
 func (summaries *Summary) PrintSummaries() {

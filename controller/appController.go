@@ -56,7 +56,7 @@ func beginTransaction(client *omise.Client, consumers chan *S.Summary, isDebug b
 }
 
 func consume(client *omise.Client,
-	consumers chan *S.Summary,
+	consumers chan<- *S.Summary,
 	consumer *S.Summary,
 	tran *T.Transaction,
 	doCharge bool,
@@ -65,7 +65,7 @@ func consume(client *omise.Client,
 	var payErr error
 
 	if doCharge {
-		payErr = payment.BeginCharge(tran, client)
+		// payErr = payment.BeginCharge(tran, client)
 	}
 
 	if payErr != nil {
