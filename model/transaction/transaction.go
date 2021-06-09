@@ -2,6 +2,7 @@ package transaction
 
 import (
 	"bytes"
+	"fmt"
 	"strconv"
 )
 
@@ -14,21 +15,41 @@ type Transaction struct {
 	Year       int
 }
 
+func (t *Transaction) String() string {
+	return fmt.Sprintf("transaction: name:%s amount:%.2f cardNo:%s ccv:%s expire:%d/%d",
+		t.Name,
+		float64(t.Amount)/100,
+		t.CardNumber,
+		t.CCV,
+		t.Month,
+		t.Year,
+	)
+}
+
+func parseNumber(text, field string) (int, error) {
+	num, err := strconv.Atoi(text)
+	if err != nil {
+		return 0, fmt.Errorf("create transaction error: %s must be number", field)
+	}
+	return num, nil
+}
+
 // 	Ex: Mr. Bildad R Sackville,5073530,4716972894061735,064,8,2019
 func CreateTransaction(d []byte) (*Transaction, error) {
 	field := bytes.Split(d, []byte(","))
 
 	// check for error
-	amount, err := strconv.Atoi(string(field[1]))
-	if err != nil {
-		return nil, err
-	}
-	month, err := strconv.Atoi(string(field[4]))
+	amount, err := parseNumber(string(field[1]), "Amount")
 	if err != nil {
 		return nil, err
 	}
 
-	year, err := strconv.Atoi(string(field[5]))
+	month, err := parseNumber(string(field[4]), "Month")
+	if err != nil {
+		return nil, err
+	}
+
+	year, err := parseNumber(string(field[5]), "Year")
 	if err != nil {
 		return nil, err
 	}

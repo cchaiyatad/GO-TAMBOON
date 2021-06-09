@@ -1,6 +1,7 @@
 package summaries
 
 import (
+	"log"
 	S "tamboon/model/summary"
 )
 
@@ -17,11 +18,13 @@ func CleanConsumer(consumers chan *S.Summary) {
 	close(consumers)
 }
 
-func GetSummaries(consumers <-chan *S.Summary, top int) *S.Summary {
+func GetSummaries(consumers <-chan *S.Summary, top int, isDebug bool) *S.Summary {
 	summaries := S.CreateNewSummary(top)
 
 	for consumer := range consumers {
-		// fmt.Printf("%s\n", consumer)
+		if isDebug {
+			log.Printf("summaries: %s\n", consumer)
+		}
 		summaries.Merge(consumer)
 	}
 	return summaries

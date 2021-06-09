@@ -2,18 +2,19 @@ package decrypt
 
 import (
 	"bufio"
+	"log"
 	"os"
 	"tamboon/cipher"
 )
 
-func GetProducer(filePath string) (<-chan []byte, *os.File, error) {
+func GetProducer(filePath string, isDebug bool) (<-chan []byte, *os.File, error) {
 	rotData, filePointer, err := getDecryptFile(filePath)
 	if err != nil {
 		return nil, filePointer, err
 	}
 
 	producer := make(chan []byte)
-	go beginDecrypt(rotData, producer)
+	go beginDecrypt(rotData, producer, isDebug)
 	return producer, filePointer, nil
 }
 
@@ -33,12 +34,14 @@ func getDecryptFile(filePath string) (*cipher.Rot128Reader, *os.File, error) {
 	return rotData, filePointer, err
 }
 
-func beginDecrypt(rotData *cipher.Rot128Reader, prod chan<- []byte) {
+func beginDecrypt(rotData *cipher.Rot128Reader, prod chan<- []byte, isDebug bool) {
 	scanner := bufio.NewScanner(rotData)
 	scanner.Split(bufio.ScanLines)
 	for scanner.Scan() {
 		txt := []byte(scanner.Text())
-		// fmt.Printf("%s\n", txt)
+		if isDebug {
+			log.Printf("decrpyt: %s\n", txt)
+		}
 		prod <- txt
 	}
 

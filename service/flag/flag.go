@@ -8,20 +8,17 @@ import (
 var file = flag.String("f", "", "path to file")
 var pk = flag.String("pk", "", "omise Public Key")
 var sk = flag.String("sk", "", "omise Secret Key")
-var number = flag.Int("n", 8, "number of tasks")
+var number = flag.Int("n", 4, "number of tasks")
 var tops = flag.Int("t", 3, "number of top donor")
+var debug = flag.Bool("d", false, "log debug message")
 
-func PraseFlag() (ok bool) {
+func PraseFlag() error {
 	flag.Parse()
 
-	if *file != "" && *pk != "" && *sk != "" {
-		ok = true
-	} else {
-		// throw error
-		fmt.Println("Usage: ./app -f [pathToFile] -pk [omisePublicKey] -sk [omiseSecretKey]")
+	if !(*file != "" && *pk != "" && *sk != "") {
+		return fmt.Errorf("Usage: ./app -f [pathToFile] -pk [omisePublicKey] -sk [omiseSecretKey]")
 	}
-
-	return
+	return nil
 }
 
 func GetFilePath() string {
@@ -42,4 +39,8 @@ func GetPublickey() string {
 
 func GetSecretkey() string {
 	return *sk
+}
+
+func IsDebug() bool {
+	return *debug
 }

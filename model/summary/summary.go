@@ -16,7 +16,7 @@ type Summary struct {
 }
 
 func (s *Summary) String() string {
-	return fmt.Sprintf("Success: %d\t%d\nFail: %d\t%d\nTop %d Donors: %s",
+	return fmt.Sprintf("Success: %d %d Fail: %d %d Top %d Donors: %s",
 		s.countSuccess,
 		s.amountSuccess,
 		s.countFail,
@@ -41,7 +41,7 @@ func (s *Summary) Update(t T.Transaction, isSuccess bool) {
 		s.countSuccess += 1
 		s.amountSuccess += int(t.Amount)
 
-		// Check max
+		// check max
 		lastIdx := len(s.donors) - 1
 		if s.donors[lastIdx].Amount < int(t.Amount) {
 			s.donors[lastIdx] = &D.Donor{Name: t.Name, Amount: int(t.Amount)}
