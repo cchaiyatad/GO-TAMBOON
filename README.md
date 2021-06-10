@@ -68,7 +68,7 @@ Executed time: 3m6.979439124s
 
 ### Performance (at 06/2021)
 
-| n | time <br /> (m:s:ms) | Success rate <br /> (of all card) |Success rate <br /> (of only valid <br />or not expired card) |
+| n | time <br /> (m:s:ms) | Success rate <br /> (of all card) |Success rate <br /> (of only valid <br />or non expired card) |
 | ----------- | ----------- | ----------- | ----------- |
 | 1 | 10:47:96 | 48.20% | 100.00% |
 | 2 | 04:34:71 | 48.20% | 100.00% |
@@ -80,6 +80,8 @@ Executed time: 3m6.979439124s
 | 8 | 00:48:11 | 23.20% | 48.13% |
 | 9 | 00:31:85 | 15.00% | 31.12% |
 | 10 | 00:27:20 | 12.90% | 26.76% |
+
+the reason that the success rate of only valid or not expired card become lower when degree of parallelism is increase is because it reach the [Charge API][0] limit rate
 
  [0]: https://www.omise.co/charges-api
  [1]: https://en.wikipedia.org/wiki/Caesar_cipher
