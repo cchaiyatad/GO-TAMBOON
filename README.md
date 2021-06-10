@@ -1,69 +1,88 @@
-# GO-TAMBOON ไปทำบุญ
+# GO-TAMBOON
 
-This is a small challenge project to see how good you are with Go. Included in this
-repository is a CSV list of Song-pah-pa (ซองผ้าป่า). It is a white envelope with money
-inside and the donor name printed on the front. They are usually collected en bulk from
-multiple people in order to round up money to repair or construct new temple buildings.
+This project is a part of [golang challenge][3]
 
-The idea is that your donation amount should be kept secret les the activity becomes an
-act of flaunting your wealth.
-
-But we're a payment gateway, we can do better than that. The envelope will contain,
-instead, a valid CC number (fake ones, not a real working card) and the desired donation
-amount. The entire list is also encrypted using NSA-proof variant of the
-[Caesar Cipher][1] :troll:
-
-### CONTENTS
-
-* `data/fng.csv.rot128` - A ROT-128 encrypted CSV file.
-* `cipher/rot128.go` - Sample ROT-128 encrypt-/decrypter.
-
-### EXERCISE
-
-Write a GO command-line module that, when given the CSV list, calls the [Charge API][0] to
-make donations by creating a charge for each row in the file and produce a summary at the
-end.
-
-Example:
-
-```sh
-$ cd $GOPATH/omise/go-tamboon
-$ go install -v .
-
-$ $GOPATH/bin/go-tamboon test.csv
-
-performing donations...
-done.
-
-        total received: THB  210,000.00
-  successfully donated: THB  200,000.00
-       faulty donation: THB   10,000.00
-
-    average per person: THB      534.23
-            top donors: Obi-wan Kenobi
-                        Luke Skywalker
-                        Kylo Ren
-```
-
-**Requirements:**
+## Goal
 
 * Decrypt the file using a simple [ROT-128][2] algorithm.
 * Make donations by creating a Charge via the [Charge API][0] for each row in the
-  decrypted CSV.
+decrypted CSV.
 * Produce a brief summary at the end.
 * Handle errors gracefully, without stopping the entire process.
 * Writes readable and maintainable code.
 
-**Bonus:**
+### Bonus
 
 * Have a good Go package structure.
 * Be a good internet citizen and throttles the API call if we hit rate limit.
 * Run as fast as possible on a multi-core CPU.
 * Allocate as little memory as possible.
 * Complete the entire process without leaving large trace of Credit Card numbers
-  in memory, or on disk.
+in memory, or on disk.
 * Ensure reproducible builds on your workspace.
+
+## How to run
+
+I provide `run.sh` script for execute. The meaning of each flag is
+
+``` bash
+-f  string  # path to encrypt file
+-pk string  # public key
+-sk string  # secret key
+-n num      # number of task to run in parallel
+-t num      # show top num in summary
+-d boolean  # if true the will print log on terminal
+```
+
+You can get **public key** and **secret key** from [omise][4] website
+
+## Result
+
+The result in following is ran on 06/2021
+
+Because more of credit card data may expired in the future so the success rate may not be the same
+
+``` bash
+$ ./run.sh #  -n 3 -d false
+
+Performing donations on ../data/fng.1000.csv.rot128
+Done.
+
+Summary:
+
+total received           : 26863951.03  THB
+successfully donated     : 13094005.50  THB
+faulty donation          : 13769945.53  THB
+
+all                      : 1000 times
+success rate             : 48.20 %
+average per person       : 13094.01     THB
+
+Top 3 Donors:
+ 1. Mrs. Mimosa R Tûk              :     50750.24 THB
+ 2. Mr. Falco S Bracegirdle        :     50744.57 THB
+ 3. Mrs. Pimpernel C Headstrong    :     50684.38 THB
+
+Executed time: 3m6.979439124s
+```
+
+### Performance (at 06/2021)
+
+| n | time <br /> (m:s:ms) | Success rate <br /> (of all card) |Success rate <br /> (of only valid <br />or not expired card) |
+| ----------- | ----------- | ----------- | ----------- |
+| 1 | 10:47:96 | 48.20% | 100.00% |
+| 2 | 04:34:71 | 48.20% | 100.00% |
+| 3 | 03:06:98 | 48.20% | 100.00% |
+| 4 | 02:21:42 | 48.20% | 100.00% |
+| 5 | 01:54:04 | 47.50% | 98.55% |
+| 6 | 01:07:20 | 30.80% | 63.90% |
+| 7 | 01:05:43 | 29.00% | 60.17% |
+| 8 | 00:48:11 | 23.20% | 48.13% |
+| 9 | 00:31:85 | 15.00% | 31.12% |
+| 10 | 00:27:20 | 12.90% | 26.76% |
 
  [0]: https://www.omise.co/charges-api
  [1]: https://en.wikipedia.org/wiki/Caesar_cipher
  [2]: https://play.golang.org/p/dCWYyWPHwj4
+ [3]: https://github.com/opn-ooo/challenges/tree/master/challenge-go
+ [4]: https://www.omise.co
